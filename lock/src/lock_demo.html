@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>手势密码</title>
+    <style>
+        html, body, #container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #container {
+            background-color: rgba(230, 229, 229, .58);
+        }
+        .header {
+            position: fixed;
+            bottom: 77px;
+            right: 20px;
+            padding: 8px 12px;
+            background-color: #8f87f9;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        解锁
+    </div>
+    <div id="container"></div>
+    <script src="../lock.min.js"></script>
+    <script>
+        // 去除字符串内所有的空格：str = str.replace(/\s*/g,"");
+        //
+        // 去除字符串内两头的空格：str = str.replace(/^\s*|\s*$/g,"");
+        //
+        // 去除字符串内左侧的空格：str = str.replace(/^\s*/,"");
+        //
+        // 去除字符串内右侧的空格：str = str.replace(/(\s*$)/g,"");
+        document.getElementsByClassName('header')[0].addEventListener('click', function (e) {
+            if (e.target.innerHTML.replace(/^\s*|\s*$/g, "") === '解锁')
+                lock.setOptions({
+                    unlockFlag: !0
+                }),
+                e.target.innerHTML = '设置手势密码'
+            else if (e.target.innerHTML.replace(/^\s*|\s*$/g, "") === '设置手势密码')
+                lock.setOptions({
+                    unlockFlag: !1
+                }),
+                    e.target.innerHTML = '解锁'
+        })
+        var unlockFlag = !1; // 是否是解锁，true为解锁，false为设置手势密码
+        const lock = new Lock({
+            strokeColor: "#6144fc", // 描边颜色
+            fillColor: "#685EFC", // 填充颜色
+            width: document.body.offsetWidth, // Number
+            height: document.body.offsetHeight, // Number height >= width
+            canvasId: 'container_lock', // 用_作为连接父元素id和canvasid,不能为空
+            unlockFlag: unlockFlag,
+            firstLock: function (pwd) { // 第一次设置手势密码成功回调
+                console.log("再次绘制解锁图案")
+            },
+            finalLock: function (pwd, state) { // 只有二次验证失败时会调这个函数
+                console.log("解锁图案不一致，请重新设置")
+            },
+            initCallback: function (module) {
+                console.log('初始化完成！')
+            },
+            successLock: function (pwd) { // 设置密码成功/解锁成功回调
+                if (lock.unlockFlag) {
+                    // 验证登录密码
+                    const puts =  [1, 2, 3, 6, 5, 4, 7, 8, 9]
+                    if (pwd.toString() === puts.toString()) {
+                        console.log("解锁成功!")
+                    } else {
+                        console.log('密码错误')
+                    }
+                } else {
+                    // 设置手势密码
+                    console.log("设置成功!")
+                }
+            },
+            pwdIsNotSafe (pwd) { // 密码设置少于6位数触发
+                console.log('密码过于简单，请再次设置')
+            }
+        })
+    </script>
+</body>
+</html>
